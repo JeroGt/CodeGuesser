@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1a1a24">
+  <meta name="description" content="CodeDuell: Knack den 4-stelligen Geheimcode deines Gegners, bevor er deinen knackt. Gegen den Bot oder zu zweit am Handy.">
+  <title>CodeDuell · Knack den Code</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="app">
+
+  <!-- ===================== HOME ===================== -->
+  <section class="screen" id="screen-home">
+    <div class="home-inner">
+      <div class="logo" aria-hidden="true">
+        <span class="logo-tile t-hit">C</span><span class="logo-tile t-near">O</span><span class="logo-tile t-miss">D</span><span class="logo-tile t-accent">E</span>
+      </div>
+      <h1 class="home-title">CodeDuell</h1>
+      <p class="home-tag">Knack den Geheimcode deines Gegners, bevor er deinen knackt.</p>
+
+      <div class="home-actions">
+        <button class="btn btn-primary" id="btn-mode-bot">Gegen den Bot</button>
+        <button class="btn btn-secondary" id="btn-mode-online">Online mit Einladungscode</button>
+        <button class="btn btn-secondary" id="btn-mode-duel">Zu zweit am Handy</button>
+      </div>
+
+      <p class="home-stats" id="home-stats" hidden></p>
+
+      <details class="rules">
+        <summary>So funktioniert&rsquo;s</summary>
+        <div class="rules-body">
+          <p>Beide w&auml;hlen einen geheimen 4&#8209;stelligen Code. Dann wird abwechselnd geraten. Nach jedem Versuch verr&auml;t dir die Farbe, wie nah du dran bist:</p>
+          <div class="rules-example">
+            <p class="rules-caption">Geheimcode des Gegners: <strong>1&thinsp;2&thinsp;3&thinsp;4</strong> &middot; Dein Versuch:</p>
+            <div class="mini-row" aria-hidden="true">
+              <span class="tile mini t-miss">0</span>
+              <span class="tile mini t-hit">2</span>
+              <span class="tile mini t-near">4</span>
+              <span class="tile mini t-miss">6</span>
+            </div>
+            <ul class="rules-legend">
+              <li><span class="dot d-hit"></span><strong>2</strong> steht an der richtigen Stelle</li>
+              <li><span class="dot d-near"></span><strong>4</strong> ist im Code, aber woanders</li>
+              <li><span class="dot d-miss"></span><strong>0</strong> und <strong>6</strong> kommen nicht vor</li>
+            </ul>
+          </div>
+          <p>Wer den Code zuerst knackt, gewinnt. Der zweite Spieler bekommt noch einen letzten Ausgleichsversuch, damit niemand einen Startvorteil hat.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===================== SETUP ===================== -->
+  <section class="screen" id="screen-setup">
+    <header class="screen-head">
+      <button class="btn-back" data-back aria-label="Zur&uuml;ck">&larr;</button>
+      <h2 id="setup-title">Neues Spiel</h2>
+    </header>
+
+    <div class="setup-body">
+      <div class="setup-group" id="group-difficulty">
+        <span class="setup-label">Schwierigkeit des Bots</span>
+        <div class="seg" role="radiogroup" aria-label="Schwierigkeit">
+          <button class="seg-btn" data-diff="easy">Leicht</button>
+          <button class="seg-btn is-active" data-diff="normal">Normal</button>
+          <button class="seg-btn" data-diff="hard">Schwer</button>
+        </div>
+        <p class="setup-hint" id="diff-hint">Der Bot spielt clever, aber nicht perfekt.</p>
+      </div>
+
+      <div class="setup-group" id="group-names" hidden>
+        <span class="setup-label">Wer spielt?</span>
+        <input class="name-input" id="name-p1" type="text" maxlength="12" placeholder="Spieler 1" autocomplete="off" enterkeyhint="next">
+        <input class="name-input" id="name-p2" type="text" maxlength="12" placeholder="Spieler 2" autocomplete="off" enterkeyhint="done">
+      </div>
+
+      <div class="setup-group">
+        <span class="setup-label">Regeln</span>
+        <label class="toggle-row">
+          <span>
+            Doppelte Ziffern erlauben
+            <small>Codes wie 3&thinsp;3&thinsp;8&thinsp;1 sind dann m&ouml;glich</small>
+          </span>
+          <span class="switch"><input type="checkbox" id="opt-repeats"><span class="knob"></span></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="screen-foot">
+      <button class="btn btn-primary" id="btn-setup-next">Weiter</button>
+    </div>
+  </section>
+
+  <!-- ===================== ONLINE ===================== -->
+  <section class="screen" id="screen-online">
+    <header class="screen-head">
+      <button class="btn-back" data-back aria-label="Zur&uuml;ck">&larr;</button>
+      <h2>Online spielen</h2>
+    </header>
+
+    <div class="online-body">
+      <div>
+        <label class="setup-label" for="online-name">Dein Name</label>
+        <input class="name-input" id="online-name" type="text" maxlength="12" placeholder="Dein Name" autocomplete="off" enterkeyhint="done">
+      </div>
+
+      <div class="online-block">
+        <h3>Neues Spiel erstellen</h3>
+        <p>Du bekommst einen Einladungscode, den du deinem Gegner schickst.</p>
+        <label class="toggle-row toggle-plain">
+          <span>Doppelte Ziffern erlauben</span>
+          <span class="switch"><input type="checkbox" id="opt-repeats-online"><span class="knob"></span></span>
+        </label>
+        <button class="btn btn-primary" id="btn-host">Spiel erstellen</button>
+      </div>
+
+      <div class="online-or">oder</div>
+
+      <div class="online-block">
+        <h3>Spiel beitreten</h3>
+        <p>Gib den Code ein, den dir dein Gegner geschickt hat.</p>
+        <input class="code-input" id="join-code" type="text" maxlength="5" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false" enterkeyhint="go">
+        <button class="btn btn-secondary" id="btn-join">Beitreten</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INVITE ===================== -->
+  <section class="screen" id="screen-invite">
+    <div class="pass-inner">
+      <p class="invite-label">Dein Einladungscode</p>
+      <div class="code-display" id="invite-code">&middot;&middot;&middot;&middot;&middot;</div>
+      <p class="pass-text">Schick den Code deinem Gegner. Sobald er beitritt, geht&rsquo;s automatisch los.</p>
+      <button class="btn btn-secondary" id="btn-share-code">Code teilen</button>
+      <p class="wait-note"><span class="spinner" aria-hidden="true"></span> Warte auf Mitspieler</p>
+      <button class="btn btn-ghost" id="btn-invite-cancel">Abbrechen</button>
+    </div>
+  </section>
+
+  <!-- ===================== HANDOVER ===================== -->
+  <section class="screen" id="screen-pass">
+    <div class="pass-inner">
+      <div class="pass-icon" aria-hidden="true">&#128241;</div>
+      <h2 class="pass-title" id="pass-title">Gib das Handy weiter</h2>
+      <p class="pass-text" id="pass-text"></p>
+      <button class="btn btn-primary" id="btn-pass-ready">Bereit</button>
+      <button class="btn btn-ghost" id="btn-wait-cancel" hidden>Abbrechen</button>
+    </div>
+  </section>
+
+  <!-- ===================== SECRET ENTRY ===================== -->
+  <section class="screen" id="screen-secret">
+    <header class="screen-head">
+      <button class="btn-back" data-back aria-label="Zur&uuml;ck">&larr;</button>
+      <h2 id="secret-title">Dein Geheimcode</h2>
+    </header>
+
+    <div class="secret-body">
+      <p class="secret-hint" id="secret-hint">W&auml;hle 4 Ziffern. Diesen Code muss dein Gegner erraten.</p>
+      <div class="slot-row" id="secret-slots" aria-label="Geheimcode-Eingabe"></div>
+      <p class="secret-privacy" id="secret-privacy" hidden>&#128064; Nicht spicken lassen!</p>
+    </div>
+
+    <div class="pad-zone">
+      <div class="pad" id="pad-secret"></div>
+    </div>
+  </section>
+
+  <!-- ===================== PLAY ===================== -->
+  <section class="screen" id="screen-play">
+    <header class="versus" id="versus">
+      <div class="versus-side" id="vs-p0">
+        <span class="versus-name" id="vs-name-0">Du</span>
+        <span class="versus-tries" id="vs-tries-0">0 Versuche</span>
+      </div>
+      <span class="versus-round" id="vs-round">Runde 1</span>
+      <div class="versus-side" id="vs-p1">
+        <span class="versus-name" id="vs-name-1">Bot</span>
+        <span class="versus-tries" id="vs-tries-1">0 Versuche</span>
+      </div>
+    </header>
+
+    <div class="turn-banner" id="turn-banner">Du bist dran</div>
+
+    <div class="opp-strip" id="opp-strip">
+      <button class="opp-summary" id="opp-summary" aria-expanded="false">
+        <span class="opp-label" id="opp-label">Bot</span>
+        <span class="opp-last" id="opp-last"><span class="opp-none">noch kein Versuch</span></span>
+        <span class="opp-chev" aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="opp-history" id="opp-history" hidden></div>
+    </div>
+
+    <div class="board" id="board" aria-live="polite"></div>
+
+    <div class="pad-zone">
+      <div class="pad" id="pad-play"></div>
+    </div>
+  </section>
+
+  <!-- ===================== END OVERLAY ===================== -->
+  <div class="end-overlay" id="end-overlay" hidden>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <div class="end-card">
+      <p class="end-emoji" id="end-emoji" aria-hidden="true">&#127881;</p>
+      <h2 class="end-title" id="end-title">Gewonnen!</h2>
+      <p class="end-sub" id="end-sub"></p>
+      <div class="end-codes" id="end-codes"></div>
+      <div class="end-actions">
+        <button class="btn btn-primary" id="btn-rematch">Revanche</button>
+        <button class="btn btn-ghost" id="btn-menu">Zum Men&uuml;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+</main>
+
+<script src="peerjs.min.js"></script>
+<script src="game.js"></script>
+<script src="bot.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
