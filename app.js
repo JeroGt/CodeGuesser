@@ -702,9 +702,8 @@
       row.appendChild(label);
       const mini = document.createElement("div");
       mini.className = "mini-row";
-      const own = S.mode === "online" ? p === S.local : p === 0;
       const secret = S.secrets[p] || "????";
-      for (const d of secret) mini.appendChild(makeTile(d, "mini " + (own ? "t-accent" : "t-miss")));
+      for (const d of secret) mini.appendChild(makeTile(d, "mini t-code"));
       row.appendChild(mini);
       codes.appendChild(row);
     }

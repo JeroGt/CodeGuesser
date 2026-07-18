@@ -196,6 +196,13 @@ body {
 .t-miss  { background: var(--miss); color: var(--text-dim); }
 .t-accent{ background: var(--accent); color: var(--accent-ink); }
 
+/* Aufgedeckte Geheimcodes im Ergebnis: helle Tiles, dunkle Ziffern */
+.tile.t-code {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
 .home-title {
   font-size: 2.1rem;
   font-weight: 800;
@@ -774,11 +781,11 @@ body {
 .end-code-label {
   font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.end-card.won .end-code-label { color: var(--accent-ink); }
 .end-code-row .mini-row { gap: 5px; }
 
 .end-actions {
