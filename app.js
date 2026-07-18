@@ -246,10 +246,12 @@
 
   function onSecretKey(k) {
     if (k === "back") {
+      if (secretInput.length > 0) Sound.erase();
       secretInput = secretInput.slice(0, -1);
       renderSecretSlots();
     } else if (k === "submit") {
-      if (!validCodeOrToast(secretInput)) { shakeEl($("secret-slots")); vibrate(60); return; }
+      if (!validCodeOrToast(secretInput)) { shakeEl($("secret-slots")); vibrate(60); Sound.invalid(); return; }
+      Sound.tap();
       S.secrets[secretCtx.player] = secretInput;
       const done = secretCtx.onDone;
       secretCtx = null;
@@ -258,6 +260,7 @@
       if (secretInput.length >= 4) return;
       secretInput += k;
       vibrate(8);
+      Sound.tap();
       renderSecretSlots();
     }
   }
@@ -434,6 +437,7 @@
   function onPlayKey(k) {
     if (!isHumanTurn() || S.locked) return;
     if (k === "back") {
+      if (S.input.length > 0) Sound.erase();
       S.input = S.input.slice(0, -1);
       refreshCurrentRow();
       renderPlayPad();
@@ -442,6 +446,7 @@
         const row = $("current-row");
         if (row) shakeEl(row);
         vibrate(60);
+        Sound.invalid();
         return;
       }
       humanGuess();
@@ -449,6 +454,7 @@
       if (S.input.length >= 4) return;
       S.input += k;
       vibrate(8);
+      Sound.tap();
       refreshCurrentRow();
       renderPlayPad();
     }
@@ -504,6 +510,7 @@
       setTimeout(() => {
         t.classList.remove("filled");
         t.classList.add(fb[i]);
+        Sound.tile(i, fb[i]);
       }, i * REVEAL_STEP + REVEAL_DUR / 2);
     });
 
@@ -587,6 +594,7 @@
     Bot.observe(S.bot, guess, fb);
     S.guesses[1].push({ guess, fb });
     updateHints(1, guess, fb);
+    Sound.notify();
     renderStrip();
     renderVersus();
     setTimeout(() => afterGuess(1, fb), 700);
@@ -669,7 +677,14 @@
     renderEndCodes();
 
     overlay.hidden = false;
-    if (celebrate) launchConfetti();
+    if (celebrate) {
+      launchConfetti();
+      Sound.win();
+    } else if (S.winner === "draw") {
+      Sound.draw();
+    } else {
+      Sound.lose();
+    }
     renderHomeStats();
   }
 
@@ -878,6 +893,7 @@
     S = newGame();
     S.local = 0;
     netSend({ t: "config", allowRepeats: net.allowRepeats, name: net.name });
+    Sound.connect();
     enterOnlineSecretPhase();
   }
 
@@ -887,6 +903,7 @@
     config.names = [cleanName(msg.name, "Gastgeber"), net.name];
     S = newGame();
     S.local = 1;
+    Sound.connect();
     enterOnlineSecretPhase();
   }
 
@@ -907,6 +924,7 @@
     netSend({ t: "fb", guess: msg.guess, fb });
     S.guesses[remote].push({ guess: msg.guess, fb });
     updateHints(remote, msg.guess, fb);
+    Sound.notify();
     renderStrip();
     renderVersus();
     setTimeout(() => {
@@ -1008,6 +1026,19 @@
 
     $("btn-mode-bot").addEventListener("click", () => openSetup("bot"));
     $("btn-mode-duel").addEventListener("click", () => openSetup("duel"));
+
+    /* --- Ton an/aus --- */
+    const soundBtn = $("btn-sound");
+    const renderSoundBtn = () => {
+      soundBtn.textContent = Sound.isOn() ? "🔊" : "🔇";
+      soundBtn.classList.toggle("is-off", !Sound.isOn());
+    };
+    soundBtn.addEventListener("click", () => {
+      Sound.setOn(!Sound.isOn());
+      renderSoundBtn();
+      if (Sound.isOn()) Sound.connect(); // kurze Hörprobe
+    });
+    renderSoundBtn();
 
     /* --- Online-Modus --- */
 

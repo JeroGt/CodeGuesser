@@ -18,7 +18,10 @@ Dark only. Szene: Handy auf der Couch am Abend, gedämpftes Licht, Daumenbedienu
 - --miss: oklch(0.30 0.014 285) Ziffer nicht im Code
 - --p2: oklch(0.68 0.12 255) Gegner-/Spieler-2-Markierung
 
-Strategie: Restrained mit einem Committed-Moment (Sieg-Overlay in Akzentfläche).
+Strategie: Restrained, durchgehend. Auch das Sieg-Overlay bleibt dunkel; Koralle nur als Ring, Titelfarbe und Konfetti (eine Akzentfläche wirkte wie ein Fremdkörper).
+
+## Sound
+Web-Audio-Synthese, keine Samples. Warm und kurz: Triangle + leiser Sub-Sinus, exponentielle Hüllkurven, Lowpass 4,8 kHz gegen Schärfe. Aufdeck-Töne je Tile aus einem C-Dur-Arpeggio (Treffer = Akkordton, nah dran = Quarte tiefer, daneben = dumpfer Tock): eine korrekte Reihe klingt automatisch als aufsteigendes Arpeggio. Global abschaltbar (Toggle auf dem Startscreen, persistiert).
 
 ## Typography
 - UI: system-ui Stack, eine Familie, Gewichte 400/600/800

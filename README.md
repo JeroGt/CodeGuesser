@@ -44,6 +44,7 @@ Alle drei sind für dieses Projekt gleichwertig (statische Dateien, kein Backend
 | `game.js` | Reine Spiellogik: Codes, Validierung, Wordle-Feedback |
 | `bot.js` | Bot-KI: Kandidaten-Eliminierung, Minimax auf „Schwer" |
 | `app.js` | UI, Spielablauf, Screens, Online-Modus, Konfetti |
+| `sound.js` | Sound-Engine: Web-Audio-Synthese, keine Sound-Dateien, abschaltbar |
 | `peerjs.min.js` | PeerJS (WebRTC) für den Online-Modus, lokal gebündelt |
 | `test.js` | Logik-Tests: `node test.js` |
 
